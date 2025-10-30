@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 @Entity
-@Table(name = "doctors")
+@Table(name = "doctor")
 public class Doctor {
 
     @Id
@@ -37,7 +37,7 @@ public class Doctor {
 
     @NotNull(message = "Phone number is required")
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 12)
     private String phone; // 10-digit phone number
 
     @ElementCollection

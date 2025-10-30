@@ -1,80 +1,162 @@
-/* This is the style sheet for the patientDashboard.html */
-  .card-actions {
-    background-color: #244557;
-    padding: 10px;
-    text-align: center;
-  }
-
-  .card-actions:hover{
-    background-color: #1c3745;
-  }
-  .ripple-overlay {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    background-color: #1c3745;
-    border-radius: 50%;
-    z-index: 9999;
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 1s ease-out, opacity 1s ease;
-  }
-  
-  .ripple-overlay.active {
-    transform: translate(-50%, -50%) scale(150);
-    opacity: 1;
-  }
-  
-  .modalApp {
-    position: fixed;
-  bottom: -100%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50%;
-  background: #fff;
-  padding: 20px;
-  z-index: 10000;
-  transition: bottom 1.5s ease-in;
-  box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.3);
-  border-radius: 10px 10px 0 0;
+.card-actions {
+  background: rgba(15, 23, 42, 0.92); /* slate-900 @ ~92% */
+  color: #fff;
   text-align: center;
-  }
-  
-  .modalApp.active {
-    bottom: 0;
-  }
-  
-  .modalApp h2 {
-    margin-top: 20px;
-  }
-  
-  .modalApp input {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    width: 90%;
-    margin-bottom: 40px;
-  }
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 0 0 12px 12px;
+  transition: background-color .2s ease, filter .2s ease;
+}
+.card-actions:hover {
+  filter: brightness(0.95);
+}
+.card-actions .btn {
+  background: #0f172a; /* slate-900 */
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .08s ease, filter .15s ease;
+}
+.card-actions .btn:hover {
+  filter: brightness(1.15);
+}
+.card-actions .btn:active {
+  transform: translateY(1px);
+}
 
-  .modalApp select {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    width: 90%;
-    margin-bottom: 40px;
+
+.ripple-overlay {
+  position: fixed;
+  top: 0; left: 0; /* left/top are typically set inline for cursor position */
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: rgba(2, 6, 23, 0.25); /* near-black with transparency */
+  transform: translate(-50%, -50%) scale(0);
+  animation: rippleExpand 600ms ease-out forwards;
+  z-index: 9999;
+}
+
+@keyframes rippleExpand {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.65; }
+  70%  { transform: translate(-50%, -50%) scale(35); opacity: 0.25; }
+  100% { transform: translate(-50%, -50%) scale(45); opacity: 0; }
+}
+
+
+.modalApp {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%) translateY(110%); /* hidden off-screen by default */
+  width: 96%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -16px 50px rgba(0,0,0,.18);
+  padding: 18px 16px 20px;
+  z-index: 10000;
+  transition: transform .35s ease;
+}
+.modalApp.active {
+  transform: translateX(-50%) translateY(0); /* slide in */
+}
+
+/* Optional dim backdrop for focus */
+.modalApp-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.modalApp-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+.modalApp .modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.modalApp .field,
+.modalApp .select,
+.modalApp .textarea {
+  display: block;
+  width: 90%;
+  margin: 8px auto;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;         /* slate-300 */
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.modalApp .field:focus,
+.modalApp .select:focus,
+.modalApp .textarea:focus {
+  border-color: #0f766e;             /* teal-700 */
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+}
+
+
+.modalApp .btn-confirm {
+  display: block;
+  width: 90%;
+  margin: 12px auto 6px;
+  background: #0b3b3c;              /* dark theme-matched */
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: filter .15s ease, transform .08s ease;
+}
+.modalApp .btn-confirm:hover {
+  filter: brightness(1.2);
+}
+.modalApp .btn-confirm:active {
+  transform: translateY(1px);
+}
+
+/* Close icon (optional) */
+.modalApp .close {
+  position: absolute;
+  top: 10px; right: 14px;
+  font-size: 24px; line-height: 1;
+  color: #64748b;                    /* slate-500 */
+  cursor: pointer;
+}
+.modalApp .close:hover { color: #0f172a; }
+
+.noPatientRecord {
+  text-align: center;
+  color: #64748b;                    /* slate-500 */
+  font-style: italic;
+  padding: 16px;
+}
+
+
+@media (max-width: 640px) {
+  .card-actions { padding: 10px; }
+  .modalApp { width: 98%; }
+  .modalApp .field, .modalApp .select, .modalApp .textarea, .modalApp .btn-confirm {
+    width: 94%;
   }
-  
-  .confirm-booking {
-    padding: 10px 20px;
-    background: #1c3745;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    
-  
-    
-  }
-  .confirm-booking:hover {
-    filter: brightness(1.2);
-    background-color: #1c3745;
-  }
-  
+  .modalApp .modal-title { font-size: 1rem; }
+}

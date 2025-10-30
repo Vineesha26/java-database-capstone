@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "patient")
 public class Patient {
 
     @Id
@@ -31,7 +31,7 @@ public class Patient {
 
     @NotNull(message = "Phone cannot be null")
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 12)
     private String phone;
 
     @NotNull(message = "Address cannot be null")

@@ -1,63 +1,100 @@
-<!-- patientDashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="../assets/images/logo/logo.png" />
-    <title>PatientDashboard</title>
-    <link rel="stylesheet" href="../assets/css/adminDashboard.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/patientDashboard.css">
-    <script src="../js/render.js" defer></script>
-    <script src="../js/util.js" defer></script>
-    <script src="../js/components/header.js" defer></script>
-    <script src="../js/components/footer.js" defer></script>
-    <script type="module" src="../js/components/modals.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patient Dashboard</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/favicon.ico" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/adminDashboard.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/patientDashboard.css" />
+
+  <!-- Utilities & Components (defer to avoid render-blocking) -->
+  <script src="../js/render.js" defer></script>
+  <script src="../js/util.js" defer></script>
+  <script src="../js/components/header.js" defer></script>
+  <script src="../js/components/footer.js" defer></script>
+  <script type="module" src="../js/components/modals.js" defer></script>
 </head>
 
+<!-- Call renderContent() on load to hydrate the page -->
 <body onload="renderContent()">
-    <div class="container">
-        <div class="wrapper">
-            <div id="header"></div>
-            <main class="main-content">
-                <input type="text" id="searchBar" class="searchBar" placeholder="Search Bar for custom output" />
-                <div class="filter-wrapper">
-                    <select class="filter-select" id="filterTime">
-                        <option value="">Sort by Time</option>
-                        <option value="AM">AM</option>
-                        <option value="PM">PM</option>
-                    </select>
-                    <select class="filter-select" id="filterSpecialty">
-                        <option value="">Filter by Specialty</option>
-                        <option value="Cardiologist">Cardiologist</option>
-                        <option value="Dermatologist">Dermatologist</option>
-                        <option value="Neurologist">Neurologist</option>
-                        <option value="Pediatrician">Pediatrician</option>
-                        <option value="Orthopedic">Orthopedic</option>
-                        <option value="Gynecologist">Gynecologist</option>
-                        <option value="Psychiatrist">Psychiatrist</option>
-                        <option value="Dentist">Dentist</option>
-                        <option value="Ophthalmologist">Ophthalmologist</option>
-                        <option value="Ent">ENT Specialist</option>
-                        <option value="Urologist">Urologist</option>
-                        <option value="Oncologist">Oncologist</option>
-                        <option value="Gastroenterologist">Gastroenterologist</option>
-                        <option value="General">General Physician</option>
-                    </select>
-                </div>
-                <div id="content"></div>
-            </main>
-            <div id="footer"></div>
-        </div>
-    </div>
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <div id="modal-body"></div>
-        </div>
-    </div>
-    <script type="module" src="../js/patientDashboard.js" defer></script>
-</body>
+  <div class="container">
+    <div class="wrapper">
+      <!-- Dynamic Header -->
+      <div id="header"></div>
 
+      <main class="main-content" role="main" aria-labelledby="page-title" style="background-image:none;">
+        <h2 id="page-title">Find a Doctor</h2>
+
+        <!-- Search -->
+        <input
+          type="text"
+          id="searchBar"
+          class="searchBar"
+          placeholder="Search Bar for custom output"
+          aria-label="Search doctors by name, specialty, or time"
+        />
+
+        <!-- Filters -->
+        <div class="filter-wrapper" aria-label="Filters">
+          <select class="filter-select" id="filterTime" aria-label="Filter by time availability">
+            <option value="">Any Time</option>
+            <option value="AM">Morning (AM)</option>
+            <option value="PM">Afternoon/Evening (PM)</option>
+          </select>
+
+          <select class="filter-select" id="filterSpecialty" aria-label="Filter by specialty">
+            <option value="">All Specialties</option>
+            <option value="Cardiologist">Cardiologist</option>
+            <option value="Neurologist">Neurologist</option>
+            <option value="Orthopedist">Orthopedist</option>
+            <option value="Pediatrician">Pediatrician</option>
+          </select>
+        </div>
+
+        <!-- Dynamic doctor cards -->
+        <div id="content"></div>
+      </main>
+
+      <!-- Dynamic Footer -->
+      <div id="footer"></div>
+    </div>
+  </div>
+
+  <!-- Reusable Modal -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display:none;">
+    <div class="modal-content">
+      <span class="close" id="closeModal" aria-label="Close">&times;</span>
+      <div id="modal-body"><!-- booking form or details injected here --></div>
+    </div>
+  </div>
+
+  <!-- Page Logic -->
+  <script type="module" src="../js/patientDashboard.js" defer></script>
+
+  <!-- Small safety net: if render.js didn't define renderContent yet -->
+  <script defer>
+    window.renderContent = window.renderContent || function () {
+      // Basic bootstrapping — your patientDashboard.js should replace this.
+      // Example: ensure role is PATIENT, then render header/footer shells.
+      try {
+        const role = localStorage.getItem('selectedRole') || 'PATIENT';
+        localStorage.setItem('selectedRole', role);
+
+        // Minimal placeholders if header/footer scripts haven’t run yet
+        const header = document.getElementById('header');
+        const footer = document.getElementById('footer');
+        header && (header.innerHTML = '<div class="header"><div class="logo">Clinic · Patient</div></div>');
+        footer && (footer.innerHTML = '<div class="footer"><div>© Smart Clinic</div><div>Patient Portal</div></div>');
+      } catch (e) {
+        console.error('renderContent fallback failed:', e);
+      }
+    };
+  </script>
+</body>
 </html>
