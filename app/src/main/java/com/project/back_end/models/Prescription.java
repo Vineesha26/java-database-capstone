@@ -1,77 +1,37 @@
 package com.project.back_end.models;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-@Document(collection = "prescriptions")
+import java.util.Date;
+
+@Entity
 public class Prescription {
 
     @Id
-    private String id; // MongoDB _id (auto-generated)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @NotNull(message = "Patient name is required")
-    @Size(min = 3, max = 100, message = "Patient name must be between 3 and 100 characters")
-    private String patientName;
-
-    @NotNull(message = "Appointment ID is required")
-    private Long appointmentId; // Reference to Appointment entity's ID
-
-    @NotNull(message = "Medication is required")
-    @Size(min = 3, max = 100, message = "Medication must be between 3 and 100 characters")
+    private Long doctorId;
+    private Long patientId;
+    private Date date;
     private String medication;
 
-    @NotNull(message = "Dosage is required")
-    @Size(min = 3, max = 20, message = "Dosage must be between 3 and 20 characters")
-    private String dosage;
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @Size(max = 200, message = "Doctor notes must be at most 200 characters")
-    private String doctorNotes; // Optional
+    public Long getDoctorId() { return doctorId; }
+    public void setDoctorId(Long doctorId) { this.doctorId = doctorId; }
 
-    // ---- Constructors ----
-    public Prescription() {}
+    public Long getPatientId() { return patientId; }
+    public void setPatientId(Long patientId) { this.patientId = patientId; }
 
-    public Prescription(String patientName,
-                        Long appointmentId,
-                        String medication,
-                        String dosage,
-                        String doctorNotes) {
-        this.patientName = patientName;
-        this.appointmentId = appointmentId;
-        this.medication = medication;
-        this.dosage = dosage;
-        this.doctorNotes = doctorNotes;
-    }
-
-    // ---- Getters & Setters ----
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
-    public String getPatientName() { return patientName; }
-    public void setPatientName(String patientName) { this.patientName = patientName; }
-
-    public Long getAppointmentId() { return appointmentId; }
-    public void setAppointmentId(Long appointmentId) { this.appointmentId = appointmentId; }
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
 
     public String getMedication() { return medication; }
     public void setMedication(String medication) { this.medication = medication; }
-
-    public String getDosage() { return dosage; }
-    public void setDosage(String dosage) { this.dosage = dosage; }
-
-    public String getDoctorNotes() { return doctorNotes; }
-    public void setDoctorNotes(String doctorNotes) { this.doctorNotes = doctorNotes; }
-
-    @Override
-    public String toString() {
-        return "Prescription{" +
-                "id='" + id + '\'' +
-                ", patientName='" + patientName + '\'' +
-                ", appointmentId=" + appointmentId +
-                ", medication='" + medication + '\'' +
-                ", dosage='" + dosage + '\'' +
-                ", doctorNotes='" + doctorNotes + '\'' +
-                '}';
-    }
 }
