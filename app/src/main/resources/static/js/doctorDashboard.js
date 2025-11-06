@@ -1,16 +1,16 @@
 // app/src/main/resources/static/js/doctorDashboard.js
 
-// Imports
+// ---- Imports ----
 import { getAllAppointments } from "./services/appointmentRecordService.js";
 import { createPatientRow } from "./components/patientRows.js";
 
-// ---------- Globals ----------
+// ---- Globals ----
 const tbody = document.getElementById("patientTableBody");
 let selectedDate = todayISO();
 let token = localStorage.getItem("token");
-let patientName = null; // null means no filter; server can treat "null" specially if needed
+let patientName = null; // null means no filter
 
-// ---------- Utilities ----------
+// ---- Utilities ----
 function todayISO() {
   const d = new Date();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -32,18 +32,17 @@ function ensureAuth() {
   return true;
 }
 
-// ---------- Search bar binding ----------
+// ---- Search Bar ----
 const searchBar = document.getElementById("searchBar");
 if (searchBar) {
   searchBar.addEventListener("input", async (e) => {
     const val = (e.target.value || "").trim();
-    // Backend contract: when empty, send "null"
     patientName = val.length ? val : "null";
     await loadAppointments();
   });
 }
 
-// ---------- Filter controls ----------
+// ---- Filter Controls ----
 const todayBtn = document.getElementById("todayButton") || document.getElementById("btnToday");
 if (todayBtn) {
   todayBtn.addEventListener("click", async () => {
@@ -55,7 +54,6 @@ if (todayBtn) {
 
 const datePicker = document.getElementById("datePicker");
 if (datePicker) {
-  // Initialize with today on first paint if empty
   if (!datePicker.value) datePicker.value = selectedDate;
   datePicker.addEventListener("change", async (e) => {
     selectedDate = e.target.value || todayISO();
@@ -63,22 +61,17 @@ if (datePicker) {
   });
 }
 
-// ---------- Core loader ----------
+// ---- Core Loader ----
 export async function loadAppointments() {
   if (!ensureAuth()) return;
-
   if (!tbody) return;
-  tbody.innerHTML = `
-    <tr><td colspan="5" style="padding:12px;">Loading appointments…</td></tr>
-  `;
+
+  tbody.innerHTML = `<tr><td colspan="5" style="padding:12px;">Loading appointments…</td></tr>`;
 
   try {
-    // If patientName is still null (never typed in), server can interpret it as no filter.
     const nameForQuery = patientName === null ? "null" : patientName;
-
     const appts = await getAllAppointments(selectedDate, nameForQuery, token);
 
-    // Clear table body
     tbody.innerHTML = "";
 
     if (!appts || appts.length === 0) {
@@ -92,9 +85,7 @@ export async function loadAppointments() {
       return;
     }
 
-    // Render each appointment row
     appts.forEach((appt) => {
-      // appt is expected to include patient info; createPatientRow will handle mapping
       const row = createPatientRow(appt);
       tbody.appendChild(row);
     });
@@ -111,15 +102,12 @@ export async function loadAppointments() {
   }
 }
 
-// ---------- Initial render ----------
+// ---- Initial Render ----
 document.addEventListener("DOMContentLoaded", async () => {
-  // If your app defines renderContent (e.g., from render.js), call it
   if (typeof window.renderContent === "function") {
     try { window.renderContent(); } catch (e) { console.warn("renderContent failed:", e); }
   }
 
-  // Make sure date input reflects today's date at start
   setDatePicker(selectedDate);
-
   await loadAppointments();
 });

@@ -9,15 +9,17 @@ public class ServiceHelper {
     @Autowired
     private TokenService tokenService;
 
-    public boolean checkToken(String token) {
-        return tokenService.isTokenValid(token);
+    public boolean isValidToken(String token, String username) {
+        if (token == null || token.isEmpty()) {
+            return false;
+        }
+        return tokenService.validateToken(token, username);
     }
 
-    public String extractUsername(String token) {
-        return tokenService.getUsernameFromToken(token);
-    }
-
-    public String createToken(String username) {
-        return tokenService.generateToken(username);
+    public String extractUser(String token) {
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
+        return tokenService.extractUsername(token);
     }
 }

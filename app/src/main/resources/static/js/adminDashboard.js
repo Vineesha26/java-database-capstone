@@ -7,13 +7,11 @@ import { createDoctorCard } from "./components/doctorCard.js";
 
 // ---- Bootstrapping ----
 document.addEventListener("DOMContentLoaded", () => {
-  // Bind “Add Doctor” button (support both ids seen across pages)
+  // Bind “Add Doctor” button
   const addBtn = document.getElementById("addDocBtn") || document.getElementById("openAddDoctorModal");
-  if (addBtn) {
-    addBtn.addEventListener("click", () => openModal("addDoctor"));
-  }
+  if (addBtn) addBtn.addEventListener("click", () => openModal("addDoctor"));
 
-  // Search & filter bindings (support both `filterTime` and `sortByTime`)
+  // Search & filter bindings
   const searchBar = document.getElementById("searchBar");
   const timeFilter = document.getElementById("filterTime") || document.getElementById("sortByTime");
   const specialtyFilter = document.getElementById("filterSpecialty");
@@ -22,23 +20,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (timeFilter) timeFilter.addEventListener("change", filterDoctorsOnChange);
   if (specialtyFilter) specialtyFilter.addEventListener("change", filterDoctorsOnChange);
 
-  // Submit/Cancel inside dynamically-rendered Add Doctor modal
+  // Modal form submit/cancel
   document.addEventListener("click", async (e) => {
     const target = e.target;
 
-    // Save/Add doctor
     if (target && target.id === "saveAddDoctor") {
       e.preventDefault();
       await adminAddDoctor();
     }
 
-    // Optional: close modal by button id used in HTML
     if (target && (target.id === "cancelAddDoctor" || target.id === "closeAddDoctor")) {
       hideModal();
     }
   });
 
-  // Initial load
+  // Initial load of doctors
   loadDoctorCards();
 });
 
@@ -66,10 +62,9 @@ function renderDoctorCards(doctors = []) {
   }
 
   doctors.forEach((doc) => {
-    // Normalize properties for the card if needed
     const normalized = {
       ...doc,
-      availability: doc.availableTimes || doc.availability || [], // support both names
+      availability: doc.availableTimes || doc.availability || [],
     };
     const card = createDoctorCard(normalized);
     contentDiv.appendChild(card);
@@ -98,14 +93,13 @@ async function adminAddDoctor() {
       return;
     }
 
-    // Collect form fields (support both simple text input and checkbox list for availability)
+    // Collect form fields
     const name = document.getElementById("docName")?.value?.trim() || "";
     const email = document.getElementById("docEmail")?.value?.trim() || "";
     const password = document.getElementById("docPassword")?.value || "";
     const phone = document.getElementById("docPhone")?.value?.trim() || "";
     const specialty = document.getElementById("docSpecialty")?.value?.trim() || "";
 
-    // Availability: support CSV input (#docTimes) or checkboxes (.avail-checkbox)
     let availableTimes = [];
     const timesInput = document.getElementById("docTimes")?.value || "";
     const checkboxNodes = document.querySelectorAll(".avail-checkbox");
@@ -120,26 +114,18 @@ async function adminAddDoctor() {
         .filter(Boolean);
     }
 
-    // Basic validations (adjust as needed)
     if (!name || !email || !password || !phone || !specialty) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    const doctorPayload = {
-      name,
-      email,
-      password,
-      phone,
-      specialty,
-      availableTimes,
-    };
-
+    const doctorPayload = { name, email, password, phone, specialty, availableTimes };
     const result = await saveDoctor(doctorPayload, token);
+
     if (result.success) {
       alert("Doctor added successfully.");
       hideModal();
-      await loadDoctorCards(); // refresh list
+      await loadDoctorCards();
     } else {
       alert(result.message || "Failed to add doctor.");
     }

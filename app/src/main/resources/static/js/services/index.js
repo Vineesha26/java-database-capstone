@@ -5,13 +5,13 @@ import { openModal } from "../components/modals.js";
 import { API_BASE_URL } from "../config/config.js";
 
 // --- API endpoints ---
-const ADMIN_API = API_BASE_URL + "/admin";
-const DOCTOR_API = API_BASE_URL + "/doctor/login";
+const ADMIN_API = `${API_BASE_URL}/admin`;
+const DOCTOR_API = `${API_BASE_URL}/doctor/login`;
 
-// Make endpoints available for debugging if needed
+// Expose endpoints globally for debugging if needed
 window.__ENDPOINTS__ = { ADMIN_API, DOCTOR_API };
 
-// Small helper to POST JSON
+// --- Helper to POST JSON ---
 async function postJson(url, payload) {
   const res = await fetch(url, {
     method: "POST",
@@ -21,7 +21,7 @@ async function postJson(url, payload) {
   return res;
 }
 
-// --- Admin Login Handler (global) ---
+// --- Admin Login Handler ---
 async function adminLoginHandler() {
   try {
     const usernameEl = document.getElementById("adminUsername");
@@ -36,20 +36,17 @@ async function adminLoginHandler() {
 
     if (res.ok) {
       const data = await res.json();
-      // Expect token in response payload; adjust key if your API differs
       const token = data.token || data.accessToken || data.jwt;
       if (!token) throw new Error("No token returned from server");
 
       localStorage.setItem("token", token);
-      // Persist role and let the app render accordingly
+
       if (typeof window.selectRole === "function") {
-        window.selectRole("ADMIN"); // some apps expect uppercase
+        window.selectRole("ADMIN");
       } else {
-        // Fallback: store directly if selectRole not loaded yet
         localStorage.setItem("userRole", "admin");
       }
-      // Optionally navigate to admin dashboard
-      // window.location.href = "/admin/adminDashboard";
+
       alert("Admin login successful.");
     } else {
       alert("Invalid credentials!");
@@ -59,9 +56,9 @@ async function adminLoginHandler() {
     alert("Login failed. Please try again.");
   }
 }
-window.adminLoginHandler = adminLoginHandler; // expose globally
+window.adminLoginHandler = adminLoginHandler; // Expose globally
 
-// --- Doctor Login Handler (global) ---
+// --- Doctor Login Handler ---
 async function doctorLoginHandler() {
   try {
     const emailEl = document.getElementById("doctorEmail");
@@ -80,13 +77,13 @@ async function doctorLoginHandler() {
       if (!token) throw new Error("No token returned from server");
 
       localStorage.setItem("token", token);
+
       if (typeof window.selectRole === "function") {
         window.selectRole("DOCTOR");
       } else {
         localStorage.setItem("userRole", "doctor");
       }
-      // Optionally navigate to doctor dashboard
-      // window.location.href = "/doctor/doctorDashboard";
+
       alert("Doctor login successful.");
     } else {
       alert("Invalid credentials!");
@@ -96,21 +93,17 @@ async function doctorLoginHandler() {
     alert("Login failed. Please try again.");
   }
 }
-window.doctorLoginHandler = doctorLoginHandler; // expose globally
+window.doctorLoginHandler = doctorLoginHandler; // Expose globally
 
 // --- Wire buttons after load ---
-window.onload = function () {
+window.addEventListener("DOMContentLoaded", () => {
   const adminBtn = document.getElementById("adminLogin");
   if (adminBtn) {
-    adminBtn.addEventListener("click", () => {
-      openModal("adminLogin"); // shows admin login modal
-    });
+    adminBtn.addEventListener("click", () => openModal("adminLogin"));
   }
 
   const doctorBtn = document.getElementById("doctorLogin");
   if (doctorBtn) {
-    doctorBtn.addEventListener("click", () => {
-      openModal("doctorLogin"); // shows doctor login modal
-    });
+    doctorBtn.addEventListener("click", () => openModal("doctorLogin"));
   }
-};
+});
