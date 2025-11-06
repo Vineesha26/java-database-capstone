@@ -1,30 +1,50 @@
-package com.project.back_end.mvc;
+package com.project.back_end.controllers;
 
-import com.project.back_end.dto.AppointmentDTO;
+import com.project.back_end.services.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @Controller
 public class DashboardController {
 
-    @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
-        List<AppointmentDTO> appointments = new ArrayList<>();
+    @Autowired
+    private TokenService tokenService;
 
-        // Example data
-        AppointmentDTO dto = new AppointmentDTO();
-        dto.setDoctorName("Dr. Smith");
-        dto.setPatientName("John Doe");
-        dto.setAppointmentDate("2025-11-05");
-        dto.setAppointmentTime("10:00 AM");
+    // -------------------------
+    // Admin Dashboard
+    // -------------------------
+    @GetMapping("/adminDashboard/{token}")
+    public String adminDashboard(@PathVariable("token") String token) {
+        // Validate token for admin
+        Map<String, Object> validationResult = tokenService.validateToken(token, "admin");
 
-        appointments.add(dto);
+        if (validationResult.isEmpty()) {
+            // Token valid → render Thymeleaf admin dashboard
+            return "admin/adminDashboard";
+        } else {
+            // Token invalid → redirect to login
+            return "redirect:/";
+        }
+    }
 
-        model.addAttribute("appointments", appointments);
-        return "dashboard";
+    // -------------------------
+    // Doctor Dashboard
+    // -------------------------
+    @GetMapping("/doctorDashboard/{token}")
+    public String doctorDashboard(@PathVariable("token") String token) {
+        // Validate token for doctor
+        Map<String, Object> validationResult = tokenService.validateToken(token, "doctor");
+
+        if (validationResult.isEmpty()) {
+            // Token valid → render Thymeleaf doctor dashboard
+            return "doctor/doctorDashboard";
+        } else {
+            // Token invalid → redirect to login
+            return "redirect:/";
+        }
     }
 }
