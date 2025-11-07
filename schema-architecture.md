@@ -1,17 +1,94 @@
-# Architecture Summary
+| name                       | about                                                                                          | title                                  | labels   | assignees |
+|----------------------------|------------------------------------------------------------------------------------------------|----------------------------------------|----------|-----------|
+| Document System Architecture | Create an architecture summary and data flow documentation for the Smart Clinic Management System | "[DOCS] Add architecture design document" | architecture |           |
 
-This Spring Boot application uses both MVC and REST controllers. Thymeleaf templates power the Admin and Doctor dashboards, while REST APIs serve patient- and appointment-facing modules (e.g., mobile or SPA clients). All incoming requests are funneled through Spring MVC controllers, which delegate to a shared service layer that encapsulates business rules, validation, and orchestration. The service layer interacts with repository interfaces to persist and retrieve data.
+<br>
 
-The application uses two data stores: **MySQL** for structured operational data (patients, doctors, appointments, admin/roles) modeled as **JPA entities**, and **MongoDB** for flexible, document-centric data (e.g., prescriptions and clinical notes) modeled as **document schemas**. Transactions and constraints live primarily in MySQL, while MongoDB supports rapid iteration on prescription structures. Cross-entity operations are coordinated in services, not controllers, preserving a clear separation of concerns.
+> [!IMPORTANT]  
+> **Regarding Architecture Summary and Flow Description:**  
+> Keep structure consistent with future enterprise documentation standards.  
+> Ensure clear layer separation, consistent terminology, and testable flow steps.  
+> Include both technical and user-facing perspectives.  
+
+<br>
+
+## **Architecture Overview**
+
+**System**: Smart Clinic Management System  
+**Tech Stack**: Spring Boot, Thymeleaf, REST APIs, MySQL, MongoDB  
+
+**As a** full-stack application developer  
+**I need** a documented architecture overview  
+**So that** I can understand the structure, request lifecycle, and data flow for development and troubleshooting.
 
 ---
 
-# Numbered Flow of Data and Control
+## **Architecture Summary**
 
-1. A user (Admin/Doctor/Patient) opens a dashboard or client screen and triggers an action (e.g., “View Appointments” or “Create Prescription”).
-2. The request is routed to the appropriate **Spring MVC controller** (Thymeleaf-backed for Admin/Doctor UIs, REST controllers for client/mobile APIs).
-3. The controller validates basic inputs and delegates to a **service** method that represents the business capability (e.g., scheduleAppointment, listPrescriptions).
-4. The service applies **business logic** (rules, role checks, cross-entity validation) and orchestrates calls to one or more **repositories**.
-5. **Repositories** query/update **MySQL** via **JPA** for relational data and **MongoDB** for document data, returning domain objects/DTOs to the service.
-6. The service aggregates and transforms results into **view models** (for Thymeleaf) or **API DTOs** (for REST), handling errors and edge cases.
-7. The controller returns a **Thymeleaf view** with model data or a **JSON response**; the UI updates accordingly, and the user sees the outcome (e.g., appointment confirmed, prescription listed).
+This Spring Boot-based application follows a clean three-tier architecture pattern:
+
+- **Presentation Tier**:  
+  - Thymeleaf templates render dynamic HTML for Admin and Doctor dashboards.  
+  - REST APIs serve data to frontend or mobile clients for modules like Appointments and Patient Records.
+
+- **Application Tier**:  
+  - Controllers (both MVC and REST) route requests to a centralized **Service Layer**.  
+  - The Service Layer enforces business rules and communicates with data repositories.
+
+- **Data Tier**:  
+  - **MySQL** handles structured data (Patients, Doctors, Appointments, Admins).  
+  - **MongoDB** stores flexible, document-based prescription data.
+
+Spring Boot enables modular development and integrates well with CI/CD tools. The dual-database setup ensures optimal storage for both structured and semi-structured data.
+
+---
+
+## **Data Flow and Control Walkthrough**
+
+```gherkin
+1. User initiates a request  
+   - Through Thymeleaf (AdminDashboard/DoctorDashboard) or  
+   - Via RESTful clients (Appointment or Patient APIs)
+
+2. The request is routed by Spring Boot  
+   - MVC Controllers handle server-rendered views (.html via Thymeleaf)  
+   - REST Controllers handle HTTP API requests and respond in JSON
+
+3. The controller invokes the appropriate Service Layer method  
+   - Business rules are applied (e.g., check availability, validate form input)
+
+4. The Service Layer calls the Repository Layer  
+   - Spring Data JPA Repositories (for MySQL)  
+   - Spring Data MongoDB Repositories (for Prescriptions)
+
+5. Repositories query or persist data  
+   - MySQL stores relational data (patients, appointments)  
+   - MongoDB handles flexible schema documents (prescriptions)
+
+6. Data is bound to Java models  
+   - JPA Entities for SQL data (`@Entity`)  
+   - MongoDB Documents (`@Document`) for NoSQL collections
+
+7. Response is generated  
+   - Thymeleaf templates receive models and render HTML  
+   - REST endpoints return serialized JSON data to clients
+````
+
+---
+
+## **Acceptance Criteria**
+
+```gherkin
+Given the application is deployed and databases are configured  
+When a user accesses the Admin or Doctor dashboard via browser  
+Then the application should return an HTML page rendered with Thymeleaf templates
+
+Given a client sends a REST request for appointment data  
+When the appropriate REST controller handles the request  
+Then the service should query MySQL and return the appointment in JSON format
+
+Given a doctor submits a new prescription  
+When the service layer processes the input  
+Then it should persist the data to MongoDB and return a success message
+```
+
